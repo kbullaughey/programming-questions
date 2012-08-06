@@ -1,4 +1,4 @@
-programming-questions
+Programming Questions
 =====================
 
-A place to put code demonstrating programming questions I have
+A place to put code demonstrating programming questions I have.
