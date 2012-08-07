@@ -5,7 +5,16 @@
     <script src="ember.js" type="text/javascript"></script>
     <script src="ember-data.js" type="text/javascript"></script>
     <script src="question.js" type="text/javascript"></script>
+    <script type="text/x-handlebars" data-template-name="app">
+      <p><a {{action showBook href=true}}>Show book</a></p>
+      <p><a {{action showArticle href=true}}>Show article</a></p>
+      {{outlet titleOutlet}}
+      {{outlet summaryOutlet}}
+    </script>
   </head>
   <body>
+    <p>Question: How does one work with an association before store#load() has asynchronously populated the model?</p>
+    <p>See question.js for the code demonstrating the problem.</p>
+    <div id='hook'></div>
   </body>
 </html>
