@@ -32,7 +32,7 @@
   wsplot.segments = function(relSegs) {
     return(relSegs.map(wsplot.coord));
   };
-
+  
 /*
   // Give an item a position and make it visible.
   wsplot.place = function(item, x, y) {
@@ -49,44 +49,82 @@
   var shapeLib = {
     arrowHead: {
       par: {
+        name: 'arrow',
         fillColor: 'black',
-        segments: [[0,-8], [6,8], [0,6], [-6,8], [0,-8]]
+        segments: [[0,-8], [6,8], [0,6], [-6,8], [0,-8]],
       },
-      maker: Path
+      maker: Path,
     },
     vertical100: {
       par: {
         name: 'vertical',
         strokeColor: 'black',
         strokeWidth: wsplot.strokeWidth,
-        segments: wsplot.segments([[0,0],[0,1]])
+        segments: wsplot.segments([[0,0],[0,1]]),
       },
-      maker: Path
+      maker: Path,
     },
     vertical75: {
       par: {
         name: 'vertical',
         strokeColor: 'black',
         strokeWidth: wsplot.strokeWidth,
-        segments: wsplot.segments([[0,0],[0,0.75]])
+        segments: wsplot.segments([[0,0],[0,0.75]]),
       },
-      maker: Path
+      maker: Path,
+    },
+    vertical50: {
+      par: {
+        name: 'vertical',
+        strokeColor: 'black',
+        strokeWidth: wsplot.strokeWidth,
+        segments: wsplot.segments([[0,0],[0,0.5]]),
+      },
+      maker: Path,
     },
     turnRight: {
       par: {
         strokeColor: 'black',
         strokeWidth: wsplot.strokeWidth,
-        segments: wsplot.segments([[-0.25,0],[0.47,0]])
+        segments: wsplot.segments([[-0.25,0],[0.47,0]]),
       },
-      maker: Path
+      maker: Path,
     },
     turnRightHalf: {
       par: {
         strokeColor: 'black',
         strokeWidth: wsplot.strokeWidth,
-        segments: wsplot.segments([[0,0],[0.47,0]])
+        segments: wsplot.segments([[0,0],[0.47,0]]),
       },
-      maker: Path
+      maker: Path,
+    },
+    horizontalFull50: {
+      par: {
+        strokeColor: 'black',
+        strokeWidth: wsplot.strokeWidth,
+        segments: wsplot.segments([[-0.47,0],[0.47,0]]),
+      },
+      maker: Path,
+      position: [0,0.5],
+    },
+    angleRight: {
+      par: {
+        strokeColor: 'black',
+        strokeWidth: wsplot.strokeWidth,
+        segments: wsplot.segments([[0,0],[0.25,0.25]]),
+      },
+      maker: Path,
+      position: [0,0.5],
+    },
+    angleLeft: {
+      components: ["angleRight"],
+      scale: [-1,1],
+      position: [0.02,0],
+    },
+    angleRightArrow: {
+      components: ["arrowHead"],
+      rotate: 45,
+      position: [0.25, 0.75],
     },
     red: {
       par: {
@@ -95,9 +133,9 @@
         radius: 6,
         fillColor: '#ed1c24',
         strokeColor: 'black',
-        strokeWidth: 2
+        strokeWidth: 2,
       },
-      maker: Path.Circle
+      maker: Path.Circle,
     },
     landmark: {
       par: {
@@ -105,200 +143,330 @@
         center: new Point(0,0),
         radius: 6,
         strokeColor: 'black',
-        strokeWidth: 2
+        strokeWidth: 2,
       },
-      maker: Path.Circle
+      maker: Path.Circle,
     },
-    topArrow: {
+    destination: {
+      par: {
+        name: 'destination',
+        center: new Point(0,0),
+        radius: 6,
+        strokeColor: 'black',
+        strokeWidth: 2,
+        fillColor: '#86bcf2',
+      },
+      maker: Path.Circle,
+    },
+    quarterArcRight: {
+      parList: [
+        wsplot.point([0,0]),
+        wsplot.point([0.5-Math.sqrt(2)/4, Math.sqrt(2)/4]),
+        wsplot.point([0.5,0.5])
+      ],
+      set: {
+        strokeColor: 'black',
+        strokeWidth: wsplot.strokeWidth,
+      },
+      maker: Path.Arc,
+      position: [0,0.5],
+    },
+    yFork: {
+      components: ["angleRight", "angleLeft", "vertical50"],
+    },
+    horizontalQuarter: {
+      components: ["horizontalFull50"],
+      scale: [0.25, 1],
+    },
+    blockS: {
+      components: ["horizontalFull50"],
+      scale: [0.40, 1],
+    },
+    blockS2: {
+      components: ["blockS"],
+      position: [0,-0.07],
+    },
+    blockA: {
+      components: ["blockS"],
+      position: [0,0.15],
+    },
+    blockA2: {
+      components: ["blockA"],
+      position: [0,-0.1],
+    },
+    blockB: {
+      components: ["blockS"],
+      position: [0,-0.15],
+    },
+    blockB2: {
+      components: ["blockB"],
+      position: [0,-0.05],
+    },
+    horizontalQuarter100: {
+      components: ["horizontalQuarter"],
+      position: [0.610,0.5],
+    },
+    curveRight: {
+      components: ["vertical50", "red", "quarterArcRight", "horizontalQuarter100"],
+      position: [-0.25,0]
+    },
+    topArrowHead: {
       components: ["arrowHead"],
-      position: [0, 1]
+      position: [0, 1],
     },
     rightArrowHead: {
       components: ["arrowHead"],
       rotate: 90,
-      position: [0.5,0]
+      position: [0.5,0],
+    },
+    rightArrowHead100: {
+      components: ["rightArrowHead"],
+      position: [0, 1],
     },
     fullForward: {
-      components: ["vertical100", "red"]
+      components: ["vertical100", "red"],
+    },
+    leftDestination: {
+      components: ["destination"],
+      position: [-0.3, 0.5],
+    },
+    rightDestination: {
+      components: ["destination"],
+      position: [0.3, 0.5],
+    },
+    leftLowDestination: {
+      components: ["leftDestination"],
+      position: [0.1,-0.2],
+    },
+    rightLowDestination: {
+      components: ["rightDestination"],
+      position: [-0.1,-0.2],
+    },
+    leftHighDestination: {
+      components: ["leftDestination"],
+      position: [0.1,0.2],
+    },
+    rightHighDestination: {
+      components: ["rightDestination"],
+      position: [-0.1,0.2],
     },
     leftLandmark: {
       components: ["landmark"],
-      position: [-0.3, 0.5]
+      position: [-0.3, 0.5],
+    },
+    angleRightLandmark: {
+      components: ["landmark"],
+      position: [-0.25, 0.4],
+    },
+    angleLeftLandmark: {
+      components: ["angleRightLandmark"],
+      scale: [-1,1],
+    },
+    farLeftLandmark: {
+      components: ["landmark"],
+      position: [-0.5, 0.5],
     },
     rightLandmark: {
       components: ["landmark"],
-      position: [0.3, 0.5]
+      position: [0.3, 0.5],
+    },
+    slightRightLandmark: {
+      components: ["landmark"],
+      position: [0.1, 0.5],
     },
     rightArrow: {
-      components: ["turnRight", "rightArrowHead"]
+      components: ["turnRight", "rightArrowHead"],
     },
     rightArrow75: {
       components: ["rightArrow"],
-      position: [0, 0.75]
+      position: [0, 0.75],
+    },
+    rightArrowHead50: {
+      components: ["rightArrowHead"],
+      position: [0, 0.5],
     },
     rightArrowHalf50: {
-      components: ["rightArrowHalf"],
-      position: [0, 0.5]
+      components: ["turnRightHalf", "rightArrowHead"],
+      position: [0, 0.5],
     },
-    rightArrowHalf: {
-      components: ["turnRightHalf", "rightArrowHead"]
+    leftLandmark50: {
+      components: ["landmark"],
+      position: [-0.2, 0.5],
     },
     lowLeftLandmark: {
       components: ["landmark"],
-      position: [-0.2, 0.5]
+      position: [-0.2, 0.3],
     },
     lowRightLandmark: {
       components: ["landmark"],
-      position: [0.2, 0.5]
+      position: [0.2, 0.3],
+    },
+    rightLandmark50: {
+      components: ["landmark"],
+      position: [0.2, 0.5],
     },
     highLeftLandmark: {
       components: ["landmark"],
-      position: [-0.2, 0.7]
+      position: [-0.2, 0.7],
     },
     highRightLandmark: {
       components: ["landmark"],
-      position: [0.2, 0.7]
+      position: [0.2, 0.7],
     },
     g1N: {
-      components: ["fullForward", "topArrow"]
+      components: ["fullForward", "topArrowHead"],
     },
     g1L: {
-      components: ["g1N", "leftLandmark"]
+      components: ["g1N", "leftLandmark"],
     },
     g1R: {
-      components: ["g1N", "rightLandmark"]
+      components: ["g1N", "rightLandmark"],
     },
     g2N: {
-      components: ["vertical100", "rightArrow75", "red"]
+      components: ["vertical100", "rightArrow75", "red"],
     },
     g2L: {
-      components: ["g2N", "lowLeftLandmark"]
+      components: ["g2N", "leftLandmark50"],
     },
     g2R: {
-      components: ["g2N", "lowRightLandmark"]
+      components: ["g2N", "rightLandmark50"],
     },
     g3N: {
       components: ["g2N"],
-      scale: [-1,1]
+      scale: [-1,1],
     },
     g3L: {
       components: ["g2L"],
-      scale: [-1,1]
+      scale: [-1,1],
     },
     g3R: {
       components: ["g2R"],
-      scale: [-1,1]
+      scale: [-1,1],
     },
     g4L: {
-      components: ["fullForward", "rightArrowHalf50", "highLeftLandmark"]
+      components: ["fullForward", "rightArrowHalf50", "highLeftLandmark"],
     },
     g4R: {
-      components: ["fullForward", "rightArrowHalf50", "highRightLandmark"]
+      components: ["fullForward", "rightArrowHalf50", "highRightLandmark"],
     },
     g5L: {
       components: ["g4R"],
-      scale: [-1,1]
+      scale: [-1,1],
     },
     g5R: {
       components: ["g4L"],
-      scale: [-1,1]
-    }
-  
-/*
-    g1R: {
-    },
-    g2N: {
-      ancestor: "fullForward"
-    },
-    g2L: {
-      ancestor: "g2N"
-    },
-    g2R: {
-      ancestor: "g2N"
-    },
-    g3N: {
-      ancestor: "g2N",
-      transform: "flipVerticalAxis"
-    },
-    g3L: {
-      ancestor: "g3N"
-    },
-    g3R: {
-      ancestor: "g3N"
-    },
-    g4L: {
-    },
-    g4R: {
-    },
-    g5L: {
-    },
-    g5R: {
+      scale: [-1,1],
     },
     g6N: {
+      components: ["vertical50", "red", "horizontalFull50", "rightArrowHead50"],
     },
     g6L: {
+      components: ["g6N", "lowLeftLandmark"],
     },
     g6R: {
+      components: ["g6N", "lowRightLandmark"],
     },
     g7N: {
+      components: ["g6N"],
+      scale: [-1, 1],
     },
     g7L: {
+      components: ["g6R"],
+      scale: [-1, 1],
     },
     g7R: {
+      components: ["g6L"],
+      scale: [-1, 1],
     },
     g10N: {
+      components: ["curveRight", "rightArrowHead100"],
     },
     g10L: {
+      components: ["g10N", "farLeftLandmark"],
     },
     g10R: {
+      components: ["g10N", "slightRightLandmark"],
     },
     g11N: {
+      components: ["g10N"],
+      scale: [-1, 1],
     },
     g11L: {
+      components: ["g10R"],
+      scale: [-1, 1],
     },
     g11R: {
+      components: ["g10L"],
+      scale: [-1, 1],
     },
     g12N: {
+      components: ["yFork", "angleRightArrow", "red"],
     },
     g12L: {
+      components: ["g12N", "angleLeftLandmark"],
     },
     g12R: {
+      components: ["g12N", "angleRightLandmark"],
     },
     g13N: {
+      components: ["g12N"],
+      scale: [-1, 1],
     },
     g13L: {
+      components: ["g12R"],
+      scale: [-1, 1],
     },
     g13R: {
+      components: ["g12L"],
+      scale: [-1, 1],
     },
     g14: {
+      components: ["g1N", "blockS"],
     },
     g15: {
+      components: ["g1N", "blockA", "blockB"],
     },
     g16: {
+      components: ["g18"],
+      scale: [-1,1],
     },
     g17: {
+      components: ["g19"],
+      scale: [-1,1],
     },
     g18: {
+      components: ["g2N", "blockS2"],
     },
     g19: {
+      components: ["g2N", "blockA2", "blockB2"],
     },
     g20L: {
+      components: ["fullForward", "leftDestination"],
     },
     g20R: {
+      components: ["fullForward", "rightDestination"],
     },
     g21L: {
+      components: ["fullForward", "horizontalFull50", "leftLowDestination"],
     },
     g21R: {
+      components: ["fullForward", "horizontalFull50", "rightLowDestination"],
     },
     g22L: {
+      components: ["fullForward", "horizontalFull50", "leftHighDestination"],
     },
     g22R: {
+      components: ["fullForward", "horizontalFull50", "rightHighDestination"],
+    },
+    tee: {
+      components: ["vertical50", "horizontalFull50", "red"],
     },
     g23L: {
+      components: ["tee", "leftLowDestination"],
     },
     g23R: {
-    }
-*/
+      components: ["tee", "rightLowDestination"],
+    },
   };
 
 
@@ -329,14 +497,38 @@
       throw "InvalidShape";
     }
     /* Start with an empty group */
-    var shape = new Group();
+    var shape = new Group({name: label});
 
     /* Some shapes are built from paper constructors. Others are composites of
      * shapes. */
     if (shapeDef.maker) {
       console.log("using maker to make "+label);
-      console.log(shapeDef.par);
-      shape.addChild(new shapeDef.maker(shapeDef.par));
+      var z;
+      if (shapeDef.par) {
+        console.log(shapeDef.par);
+        z = new shapeDef.maker(shapeDef.par);
+      } else if (shapeDef.parList) {
+        /* this is ugly and only works for a certain maximum number of parameters,
+         * but it seems better than the alternatives */
+        var p = shapeDef.parList;
+        if (p.length > 6) {
+          throw "TooManyArguments";
+        }
+        z = new shapeDef.maker(p[0], p[1], p[2], p[3], p[4], p[5], p[6]);
+      } else {
+        throw "MissingParameterization";
+      }
+
+      /* See if there are additional properties to set */
+      if (shapeDef.set) {
+        z.set(shapeDef.set);
+      }
+
+      /* See if it needs smoothing */
+      if (shapeDef.smooth == "yes") {
+        z.smooth();
+      }
+      shape.addChild(z);
     } else {
       console.log("making "+label+" from components");
       shapeDef.components.forEach(function(el) {
@@ -359,6 +551,7 @@
       shape.position = shape.position + wsplot.coord(shapeDef.position);
     }
 
+
     /* Return the result */
     return(shape);
   };
@@ -366,40 +559,71 @@
   var shapes =
   [
     [
-      wsplot.makeShape("red"),
-      wsplot.makeShape("vertical100"),
-      wsplot.makeShape("fullForward"),
-      wsplot.makeShape("landmark"),
-      wsplot.makeShape("leftLandmark"),
-      wsplot.makeShape("arrowHead"),
-      wsplot.makeShape("rightArrowHead"),
-      wsplot.makeShape("turnRight"),
-      wsplot.makeShape("rightArrow")
-    ],
-    [
       wsplot.makeShape("g1N"),
       wsplot.makeShape("g1R"),
-      wsplot.makeShape("g1L")
+      wsplot.makeShape("g1L"),
+      null,
+      null,
+      null,
+      wsplot.makeShape("g14"),
+      wsplot.makeShape("g20R"),
+      wsplot.makeShape("g20L")
     ],
     [
       wsplot.makeShape("g2N"),
       wsplot.makeShape("g2R"),
-      wsplot.makeShape("g2L")
+      wsplot.makeShape("g2L"),
+      null,
+      null,
+      null,
+      wsplot.makeShape("g15"),
+      wsplot.makeShape("g21R"),
+      wsplot.makeShape("g21L")
     ],
     [
       wsplot.makeShape("g3N"),
       wsplot.makeShape("g3L"),
-      wsplot.makeShape("g3R")
+      wsplot.makeShape("g3R"),
+      wsplot.makeShape("g10N"),
+      wsplot.makeShape("g10R"),
+      wsplot.makeShape("g10L"),
+      wsplot.makeShape("g16"),
+      wsplot.makeShape("g22R"),
+      wsplot.makeShape("g22L")
     ],
     [
       null,
       wsplot.makeShape("g4R"),
-      wsplot.makeShape("g4L")
+      wsplot.makeShape("g4L"),
+      wsplot.makeShape("g11N"),
+      wsplot.makeShape("g11R"),
+      wsplot.makeShape("g11L"),
+      wsplot.makeShape("g17"),
+      wsplot.makeShape("g23R"),
+      wsplot.makeShape("g23L")
     ],
     [
       null,
       wsplot.makeShape("g5R"),
-      wsplot.makeShape("g5L")
+      wsplot.makeShape("g5L"),
+      wsplot.makeShape("g12N"),
+      wsplot.makeShape("g12R"),
+      wsplot.makeShape("g12L"),
+      wsplot.makeShape("g18")
+    ],
+    [
+      wsplot.makeShape("g6N"),
+      wsplot.makeShape("g6R"),
+      wsplot.makeShape("g6L"),
+      wsplot.makeShape("g13N"),
+      wsplot.makeShape("g13R"),
+      wsplot.makeShape("g13L"),
+      wsplot.makeShape("g19")
+    ],
+    [
+      wsplot.makeShape("g7N"),
+      wsplot.makeShape("g7R"),
+      wsplot.makeShape("g7L")
     ]
   ];
 
@@ -410,6 +634,13 @@
     for (var j=0; j < shapes[i].length; j++) {
       var shape = shapes[i][j];
       if (shape) {
+        var r = {
+          size: [wsplot.boxWidth*1.4, wsplot.boxHeight*1.4],
+          point: wsplot.point([-0.7,1.2]),
+          strokeColor: '#aaa',
+          strokeWidth: 1,
+        };
+        shape.addChild(new Path.Rectangle(r));
         var center = new Point((j+1)*wsplot.boxWidth*gs, (i+1)*wsplot.boxHeight*gs);
         shape.position = center;
       }
