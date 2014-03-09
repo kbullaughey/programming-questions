@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- Load the Paper.js library -->
+<script type="text/javascript" src="js/paper.js"></script>
+<!-- Define inlined PaperScript associate it with myCanvas -->
+<script type="text/paperscript" canvas="myCanvas">
+
+  // Namespace of functions I plan to use in manipulating paperjs stuff.
+  var wsplot = {};
+
+  /* All heights and widths are relative to these scalers */
+  wsplot.boxHeight = 60;
+  wsplot.boxWidth = 60;
+  wsplot.strokeWidth = 4;
+
+  /* I use some what strange coordinates that I find easy to think about. The shape
+   * bounding box ranges from -0.5 on the left, to 0.5 on the right, and from 0 
+   * on the bottom to 1 on the top. */
+
+  /* Return a tuple of coordinates in the paper coordinates, when given an [x,y]
+   * tuple in my relative coordinates. */
+  wsplot.coord = function(tuple) {
+    return([tuple[0]*wsplot.boxWidth, -tuple[1]*wsplot.boxHeight]);
+  };
+  /* Return a point in paper coordinates based on a tuple in my relative coordinates */
+  wsplot.point = function(relative) {
+    return(new Point(wsplot.coord(relative)));
+  };
+  
+  /* Return a array of tuples in paper coordinates */
+  wsplot.segments = function(relSegs) {
+    return(relSegs.map(wsplot.coord));
+  };
+
+/*
+  // Give an item a position and make it visible.
+  wsplot.place = function(item, x, y) {
+    if (x instanceof Point) {
+      item.position = x;
+    } else {
+      item.position = new Point(x, y);
+    }
+    item.visible = true;
+  };
+*/
+
+  // Library of elements
+  var shapeLib = {
+    arrowHead: {
+      par: {
+        fillColor: 'black',
+        segments: [[0,-8], [6,8], [0,6], [-6,8], [0,-8]]
+      },
+      maker: Path
+    },
+    vertical100: {
+      par: {
+        name: 'vertical',
+        strokeColor: 'black',
+        strokeWidth: wsplot.strokeWidth,
+        segments: wsplot.segments([[0,0],[0,1]])
+      },
+      maker: Path
+    },
+    vertical75: {
+      par: {
+        name: 'vertical',
+        strokeColor: 'black',
+        strokeWidth: wsplot.strokeWidth,
+        segments: wsplot.segments([[0,0],[0,0.75]])
+      },
+      maker: Path
+    },
+    turnRight: {
+      par: {
+        strokeColor: 'black',
+        strokeWidth: wsplot.strokeWidth,
+        segments: wsplot.segments([[-0.25,0],[0.47,0]])
+      },
+      maker: Path
+    },
+    turnRightHalf: {
+      par: {
+        strokeColor: 'black',
+        strokeWidth: wsplot.strokeWidth,
+        segments: wsplot.segments([[0,0],[0.47,0]])
+      },
+      maker: Path
+    },
+    red: {
+      par: {
+        name: 'red',
+        center: new Point(0,0),
+        radius: 6,
+        fillColor: '#ed1c24',
+        strokeColor: 'black',
+        strokeWidth: 2
+      },
+      maker: Path.Circle
+    },
+    landmark: {
+      par: {
+        name: 'landmark',
+        center: new Point(0,0),
+        radius: 6,
+        strokeColor: 'black',
+        strokeWidth: 2
+      },
+      maker: Path.Circle
+    },
+    topArrow: {
+      components: ["arrowHead"],
+      position: [0, 1]
+    },
+    rightArrowHead: {
+      components: ["arrowHead"],
+      rotate: 90,
+      position: [0.5,0]
+    },
+    fullForward: {
+      components: ["vertical100", "red"]
+    },
+    leftLandmark: {
+      components: ["landmark"],
+      position: [-0.3, 0.5]
+    },
+    rightLandmark: {
+      components: ["landmark"],
+      position: [0.3, 0.5]
+    },
+    rightArrow: {
+      components: ["turnRight", "rightArrowHead"]
+    },
+    rightArrow75: {
+      components: ["rightArrow"],
+      position: [0, 0.75]
+    },
+    rightArrowHalf50: {
+      components: ["rightArrowHalf"],
+      position: [0, 0.5]
+    },
+    rightArrowHalf: {
+      components: ["turnRightHalf", "rightArrowHead"]
+    },
+    lowLeftLandmark: {
+      components: ["landmark"],
+      position: [-0.2, 0.5]
+    },
+    lowRightLandmark: {
+      components: ["landmark"],
+      position: [0.2, 0.5]
+    },
+    highLeftLandmark: {
+      components: ["landmark"],
+      position: [-0.2, 0.7]
+    },
+    highRightLandmark: {
+      components: ["landmark"],
+      position: [0.2, 0.7]
+    },
+    g1N: {
+      components: ["fullForward", "topArrow"]
+    },
+    g1L: {
+      components: ["g1N", "leftLandmark"]
+    },
+    g1R: {
+      components: ["g1N", "rightLandmark"]
+    },
+    g2N: {
+      components: ["vertical100", "rightArrow75", "red"]
+    },
+    g2L: {
+      components: ["g2N", "lowLeftLandmark"]
+    },
+    g2R: {
+      components: ["g2N", "lowRightLandmark"]
+    },
+    g3N: {
+      components: ["g2N"],
+      scale: [-1,1]
+    },
+    g3L: {
+      components: ["g2L"],
+      scale: [-1,1]
+    },
+    g3R: {
+      components: ["g2R"],
+      scale: [-1,1]
+    },
+    g4L: {
+      components: ["fullForward", "rightArrowHalf50", "highLeftLandmark"]
+    },
+    g4R: {
+      components: ["fullForward", "rightArrowHalf50", "highRightLandmark"]
+    },
+    g5L: {
+      components: ["g4R"],
+      scale: [-1,1]
+    },
+    g5R: {
+      components: ["g4L"],
+      scale: [-1,1]
+    }
+  
+/*
+    g1R: {
+    },
+    g2N: {
+      ancestor: "fullForward"
+    },
+    g2L: {
+      ancestor: "g2N"
+    },
+    g2R: {
+      ancestor: "g2N"
+    },
+    g3N: {
+      ancestor: "g2N",
+      transform: "flipVerticalAxis"
+    },
+    g3L: {
+      ancestor: "g3N"
+    },
+    g3R: {
+      ancestor: "g3N"
+    },
+    g4L: {
+    },
+    g4R: {
+    },
+    g5L: {
+    },
+    g5R: {
+    },
+    g6N: {
+    },
+    g6L: {
+    },
+    g6R: {
+    },
+    g7N: {
+    },
+    g7L: {
+    },
+    g7R: {
+    },
+    g10N: {
+    },
+    g10L: {
+    },
+    g10R: {
+    },
+    g11N: {
+    },
+    g11L: {
+    },
+    g11R: {
+    },
+    g12N: {
+    },
+    g12L: {
+    },
+    g12R: {
+    },
+    g13N: {
+    },
+    g13L: {
+    },
+    g13R: {
+    },
+    g14: {
+    },
+    g15: {
+    },
+    g16: {
+    },
+    g17: {
+    },
+    g18: {
+    },
+    g19: {
+    },
+    g20L: {
+    },
+    g20R: {
+    },
+    g21L: {
+    },
+    g21R: {
+    },
+    g22L: {
+    },
+    g22R: {
+    },
+    g23L: {
+    },
+    g23R: {
+    }
+*/
+  };
+
+
+/*
+  // Create an arrow head and return it.
+  wsplot.arrow = function() {
+    var a = {
+      fillColor: 'black',
+      segments: [[0,0], [6,16], [0,14], [-6,16], [0,0]]
+    };
+    return(new Path(a));
+  };
+  wsplot.landmark = function() {
+    var a = {
+      name: 'landmark',
+      center: new Point(0,0),
+      radius: 6,
+      strokeColor: 'black',
+      strokeWidth: 2
+    };
+    return(new Path.Circle(a));
+  };
+*/
+
+  wsplot.makeShape = function(label) {
+    var shapeDef = shapeLib[label];
+    if (shapeDef === undefined) {
+      throw "InvalidShape";
+    }
+    /* Start with an empty group */
+    var shape = new Group();
+
+    /* Some shapes are built from paper constructors. Others are composites of
+     * shapes. */
+    if (shapeDef.maker) {
+      console.log("using maker to make "+label);
+      console.log(shapeDef.par);
+      shape.addChild(new shapeDef.maker(shapeDef.par));
+    } else {
+      console.log("making "+label+" from components");
+      shapeDef.components.forEach(function(el) {
+        shape.addChildren(wsplot.makeShape(el).children);
+      });
+    }
+
+    /* See if it needs to be rotated */
+    if (shapeDef.rotate) {
+      shape.rotate(shapeDef.rotate);
+    }
+
+    /* See if it needs rescaling */
+    if (shapeDef.scale) {
+      shape.scale(shapeDef.scale);
+    }
+
+    /* See if it needs repositioning */
+    if (shapeDef.position) {
+      shape.position = shape.position + wsplot.coord(shapeDef.position);
+    }
+
+    /* Return the result */
+    return(shape);
+  };
+
+  var shapes =
+  [
+    [
+      wsplot.makeShape("red"),
+      wsplot.makeShape("vertical100"),
+      wsplot.makeShape("fullForward"),
+      wsplot.makeShape("landmark"),
+      wsplot.makeShape("leftLandmark"),
+      wsplot.makeShape("arrowHead"),
+      wsplot.makeShape("rightArrowHead"),
+      wsplot.makeShape("turnRight"),
+      wsplot.makeShape("rightArrow")
+    ],
+    [
+      wsplot.makeShape("g1N"),
+      wsplot.makeShape("g1R"),
+      wsplot.makeShape("g1L")
+    ],
+    [
+      wsplot.makeShape("g2N"),
+      wsplot.makeShape("g2R"),
+      wsplot.makeShape("g2L")
+    ],
+    [
+      wsplot.makeShape("g3N"),
+      wsplot.makeShape("g3L"),
+      wsplot.makeShape("g3R")
+    ],
+    [
+      null,
+      wsplot.makeShape("g4R"),
+      wsplot.makeShape("g4L")
+    ],
+    [
+      null,
+      wsplot.makeShape("g5R"),
+      wsplot.makeShape("g5L")
+    ]
+  ];
+
+  /* How much larger the grid cells are from the shapes. */
+  var gs = 1.5;
+  /* Place all the shapes in a grid */
+  for (var i=0; i < shapes.length; i++) {
+    for (var j=0; j < shapes[i].length; j++) {
+      var shape = shapes[i][j];
+      if (shape) {
+        var center = new Point((j+1)*wsplot.boxWidth*gs, (i+1)*wsplot.boxHeight*gs);
+        shape.position = center;
+      }
+    }
+  }
+</script>
+</head>
+<body>
+  <canvas id="myCanvas" resize></canvas>
+</body>
+</html>
