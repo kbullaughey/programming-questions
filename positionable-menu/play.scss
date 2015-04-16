@@ -1,0 +1,159 @@
+/* Based on Start Bootstrap http://startbootstrap.com */
+
+.content-row {
+  margin: 4px 0;
+}
+
+/* Default styles, closed, position-invariant */
+
+@mixin transition-all {
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+#wrapper {
+  padding: 0;
+  @include transition-all;
+}
+
+#sidebar-wrapper {
+  height: 0;
+  width: 0;
+  color: white;
+  z-index: 1000;
+  position: fixed;
+  overflow-y: auto;
+  background: #000;
+  @include transition-all;
+}
+
+#page-content-wrapper {
+  margin: 0;
+  position: absolute;
+  padding: 15px;
+  @include transition-all;
+}
+
+#wrapper #sidebar-content {
+  margin: 8px;
+}
+
+
+/* left */
+@mixin panel-left {
+  #sidebar-wrapper {
+    width: 0;
+    height: 100%;
+    margin-left: -250px;
+    left: 250px;
+  }
+
+  &.opened {
+    padding-left: 250px;
+
+    #sidebar-wrapper {
+      width: 250px;
+    }
+    #page-container-wrapper {
+    }
+  }
+}
+
+/* right */
+@mixin panel-right {
+  #sidebar-wrapper {
+    width: 0;
+    height: 100%;
+    margin-right: -250px;
+    right: 250px;
+  }
+
+  &.opened {
+    padding-right: 250px;
+
+    #sidebar-wrapper {
+      width: 250px;
+    }
+    #page-content-wrapper {
+      padding-right: 250px;
+    }
+  }
+}
+
+/* bottom */
+@mixin panel-bottom {
+  #sidebar-wrapper {
+    width: 100%;
+    height: 0;
+    margin-bottom: -250px;
+    bottom: 250px; 
+  }
+
+  &.opened {
+    padding-bottom: 250px;
+
+    #sidebar-wrapper {
+      height: 250px;
+    }
+    #page-container-wrapper {
+    }
+  }
+}
+
+@mixin hide-put($label) {
+  #menu-put-#{$label} {
+    display: none;
+  }
+}
+
+/* short, i.e. landscape mode on a phone
+ *  LEFT or RIGHT */
+@media (max-height: 450px) {
+  #wrapper.panel-right {
+    @include panel-right;
+    @include hide-put(right);
+  }
+  #wrapper.panel-left {
+    @include panel-left;
+    @include hide-put(left);
+  }
+  /* hide the put-bottom button, since we don't allow it */
+  #menu-put-bottom {
+    display: none;
+  }
+}
+
+/* tall and narrow, i.e., portrait mode on a phone
+ *  only BOTTOM */
+@media (min-height: 451px) and (max-width: 450px) {
+  /* since panel-right is not available, remap it to panel-bottom */
+  #wrapper.panel-right {
+    @include panel-bottom;
+  }
+  /* hide the position buttons, since there are no choices */
+  #menu-put-left, #menu-put-bottom, #menu-put-right {
+    display: none;
+  }
+}
+
+/* large enough to fit in any position
+ *  LEFT, RIGHT, or BOTTOM */
+@media (min-height: 451px) and (min-width: 451px) {
+  #wrapper.panel-right {
+    @include panel-right;
+    @include hide-put(right);
+  }
+  #wrapper.panel-left {
+    @include panel-left;
+    @include hide-put(left);
+  }
+  #wrapper.panel-bottom {
+    @include panel-bottom;
+    @include hide-put(bottom);
+  }
+}
+
+/* END */
+
